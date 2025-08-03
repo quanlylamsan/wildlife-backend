@@ -1,8 +1,8 @@
 const Farm = require('../models/Farm'); // Đảm bảo bạn đã có model Farm.js
 
-// @desc    Tạo một cơ sở mới
-// @route   POST /api/farms
-// @access  Private
+// @desc    Tạo một cơ sở mới
+// @route   POST /api/farms
+// @access  Private
 exports.createFarm = async (req, res) => {
     try {
         const newFarm = new Farm({
@@ -16,9 +16,9 @@ exports.createFarm = async (req, res) => {
     }
 };
 
-// @desc    Lấy danh sách tất cả các cơ sở
-// @route   GET /api/farms
-// @access  Private
+// @desc    Lấy danh sách tất cả các cơ sở
+// @route   GET /api/farms
+// @access  Private
 exports.getAllFarms = async (req, res) => {
     try {
         const farms = await Farm.find(); // Có thể thêm bộ lọc dựa trên vai trò người dùng sau này
@@ -28,9 +28,9 @@ exports.getAllFarms = async (req, res) => {
     }
 };
 
-// @desc    Lấy thông tin một cơ sở theo ID
-// @route   GET /api/farms/:id
-// @access  Private
+// @desc    Lấy thông tin một cơ sở theo ID
+// @route   GET /api/farms/:id
+// @access  Private
 exports.getFarmById = async (req, res) => {
     try {
         const farm = await Farm.findById(req.params.id);
@@ -43,9 +43,9 @@ exports.getFarmById = async (req, res) => {
     }
 };
 
-// @desc    Cập nhật thông tin một cơ sở
-// @route   PUT /api/farms/:id
-// @access  Private (Admin or Manager)
+// @desc    Cập nhật thông tin một cơ sở
+// @route   PUT /api/farms/:id
+// @access  Private (Admin or Manager)
 exports.updateFarm = async (req, res) => {
     try {
         const updatedFarm = await Farm.findByIdAndUpdate(
@@ -62,9 +62,9 @@ exports.updateFarm = async (req, res) => {
     }
 };
 
-// @desc    Xóa một cơ sở
-// @route   DELETE /api/farms/:id
-// @access  Private (Admin or Manager)
+// @desc    Xóa một cơ sở
+// @route   DELETE /api/farms/:id
+// @access  Private (Admin or Manager)
 exports.deleteFarm = async (req, res) => {
     try {
         const deletedFarm = await Farm.findByIdAndDelete(req.params.id);
@@ -74,46 +74,5 @@ exports.deleteFarm = async (req, res) => {
         res.json({ message: 'Xoá cơ sở thành công' });
     } catch (err) {
         res.status(500).json({ message: 'Lỗi khi xoá cơ sở', error: err.message });
-    }
-};
-
-// --- HÀM MỚI ĐƯỢC BỔ SUNG ---
-// @desc    Tạo nhiều cơ sở từ file CSV
-// @route   POST /api/farms/bulk
-// @access  Private (Admin or Manager)
-exports.bulkCreateFarms = async (req, res) => {
-    // req.body từ frontend sẽ là một mảng các đối tượng cơ sở
-    const farmsData = req.body;
-
-    // Kiểm tra dữ liệu đầu vào
-    if (!farmsData || !Array.isArray(farmsData) || farmsData.length === 0) {
-        return res.status(400).json({ message: 'Dữ liệu không hợp lệ hoặc rỗng.' });
-    }
-
-    try {
-        // Gán owner cho mỗi cơ sở nếu cần, tương tự như createFarm
-        const farmsWithOwner = farmsData.map(farm => ({
-            ...farm,
-            owner: req.user.id
-        }));
-
-        // Sử dụng insertMany của Mongoose để thêm hàng loạt, hiệu quả hơn vòng lặp
-        const createdFarms = await Farm.insertMany(farmsWithOwner, { ordered: false });
-        
-        // Trả về kết quả thành công
-        res.status(201).json({
-            message: `Tải lên thành công ${createdFarms.length} cơ sở.`,
-            successCount: createdFarms.length
-        });
-
-    } catch (error) {
-        // Bắt lỗi nếu có, ví dụ lỗi validation hoặc trùng lặp
-        res.status(500).json({ 
-            message: 'Đã có lỗi xảy ra trong quá trình xử lý hàng loạt.',
-            error: error.message,
-            // Cung cấp thêm chi tiết lỗi nếu có
-            failCount: error.writeErrors ? error.writeErrors.length : 0, 
-            errorDetails: error.writeErrors 
-        });
     }
 };

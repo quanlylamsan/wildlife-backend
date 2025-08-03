@@ -54,6 +54,8 @@ const getUserById = async (req, res) => {
 
 // Cập nhật người dùng
 const updateUser = async (req, res) => {
+	console.log('--- DỮ LIỆU SERVER NHẬN ĐƯỢC ---');
+  console.log(req.body);
   try {
     // Không cho phép cập nhật mật khẩu qua route này
     const { password, ...updateData } = req.body;

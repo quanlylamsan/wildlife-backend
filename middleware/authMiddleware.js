@@ -12,6 +12,7 @@ const protect = async (req, res, next) => {
     try {
       // Lấy token từ header
       token = authHeader.split(' ')[1];
+	console.log('SECRET DÙNG ĐỂ KIỂM TRA TOKEN:', process.env.JWT_SECRET);
 
       // Giải mã token để lấy ID người dùng
       const decoded = jwt.verify(token, process.env.JWT_SECRET);

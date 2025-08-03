@@ -1,4 +1,5 @@
 const express = require('express');
+console.log("--- SERVER.JS ĐANG CHẠY - PHIÊN BẢN KIỂM TRA ---");
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -7,7 +8,8 @@ dotenv.config();
 const app = express();
 
 // Import các file routes
-const authRoutes = require('./routes/auth');
+
+const authRoutes = require('./routes/authRoutes');
 const farmsRoutes = require('./routes/farms');
 const farmActivitiesRoutes = require('./routes/farmActivities');
 const woodActivitiesRoutes = require('./routes/woodActivities');
@@ -24,6 +26,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 app.use(express.json());
+app.use('/api/auth', require('./routes/authRoutes'));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected successfully'))

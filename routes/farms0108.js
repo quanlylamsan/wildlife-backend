@@ -1,4 +1,3 @@
-// routes/farmRoutes.js
 const express = require('express');
 const router = express.Router();
 
@@ -8,8 +7,7 @@ const {
     getAllFarms,
     getFarmById,
     updateFarm,
-    deleteFarm,
-    bulkCreateFarms // Phải import hàm mới
+    deleteFarm
 } = require('../controllers/farmController');
 
 // Import middleware bảo mật
@@ -18,10 +16,6 @@ const { protect, isAdminOrManager } = require('../middleware/authMiddleware');
 // --- Định nghĩa các API routes ---
 router.post('/', protect, createFarm);
 router.get('/', protect, getAllFarms);
-
-// Thêm route mới cho chức năng tải lên hàng loạt
-router.post('/bulk', protect, isAdminOrManager, bulkCreateFarms);
-
 router.get('/:id', protect, getFarmById);
 router.put('/:id', protect, isAdminOrManager, updateFarm);
 router.delete('/:id', protect, isAdminOrManager, deleteFarm);
