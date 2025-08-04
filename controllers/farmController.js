@@ -160,13 +160,13 @@ const addAnimalProductToFarm = async (req, res) => {
     const farm = await Farm.findById(req.params.id);
     if (!farm) return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
 
-    const { tenLoai, mucDichNuoi, hinhThucNuoi, soLuong } = req.body;
+    const { tenLamSan, tenKhoaHoc, danBoMeDuc, danBoMeCai, danHauBiDuc, danHauBiCai, duoiMotTuoi, trenMotTuoi} = req.body;
 
-    if (!tenLoai || !mucDichNuoi || !hinhThucNuoi) {
+    if (!tenLamSan || !tenKhoaHoc || !danBoMeDuc || !danBoMeCai || !danHauBiDuc || !danHauBiCai || !duoiMotTuoi || !trenMotTuoi) {
       return res.status(400).json({ message: 'Thiếu thông tin sản phẩm động vật.' });
     }
 
-    const animalProduct = { tenLoai, mucDichNuoi, hinhThucNuoi, soLuong };
+    const animalProduct = { tenLamSan, tenKhoaHoc, danBoMeDuc, danBoMeCai, danHauBiDuc, danHauBiCai, duoiMotTuoi, trenMotTuoi  };
 
     // 👇 Khởi tạo nếu cần
     if (!farm.animalProducts) farm.animalProducts = [];

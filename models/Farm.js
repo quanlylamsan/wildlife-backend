@@ -31,8 +31,8 @@ const FarmSchema = new mongoose.Schema({
   maSo: String,
   loaiHinhCoSo: String, // gây nuôi / chế biến gỗ
   diaChi: String,
-  sanPhamDangKy: [ProductSchema],
-  thongTinDan: thongTinDanSchema, // ⬅️ thêm ở đây
+  products: [ProductSchema], // ✅ Đổi tên trường này
+  thongTinDan: thongTinDanSchema,
 }, { timestamps: true });
 
 module.exports = mongoose.model('Farm', FarmSchema);
