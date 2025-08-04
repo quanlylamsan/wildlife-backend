@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+// Controller functions
 const {
     createFarm,
     getAllFarms,
@@ -8,33 +9,36 @@ const {
     updateFarm,
     deleteFarm,
     bulkCreateFarms,
-    addProductToFarm,
+    addWoodProductToFarm, // MỚI
+	addAnimalProductToFarm, // MỚI
 } = require('../controllers/farmController');
 
-// Middleware bảo vệ nếu cần (tuỳ bạn bật/tắt)
+// Optional auth middleware
 const { protect } = require('../middleware/authMiddleware');
 
-// === ROUTES ===
+// ================== FARM ROUTES ==================
 
-// 🟢 Tạo mới một cơ sở
+// ➕ Tạo cơ sở mới
 router.post('/', protect, createFarm);
 
-// 📄 Lấy tất cả cơ sở
+// 📄 Lấy toàn bộ danh sách cơ sở
 router.get('/', protect, getAllFarms);
 
-// 📄 Lấy một cơ sở theo ID
+// 🔍 Lấy thông tin 1 cơ sở theo ID
 router.get('/:id', protect, getFarmById);
 
-// 📝 Cập nhật cơ sở
+// ✏️ Cập nhật thông tin cơ sở
 router.put('/:id', protect, updateFarm);
 
 // ❌ Xoá cơ sở
 router.delete('/:id', protect, deleteFarm);
 
-// 📥 Tạo hàng loạt cơ sở từ file Excel hoặc dữ liệu lớn
+// 📥 Tạo hàng loạt cơ sở từ Excel / danh sách
 router.post('/bulk', protect, bulkCreateFarms);
 
-// ➕ Thêm lâm sản hoặc loài nuôi vào cơ sở
-router.post('/:id/products', protect, addProductToFarm);
+
+// ==== CÁC ROUTE MỚI RÕ RÀNG ====
+router.post('/:id/products/wood', protect, addWoodProductToFarm);     // GỖ
+router.post('/:id/products/animal', protect, addAnimalProductToFarm); // ĐỘNG VẬT
 
 module.exports = router;

@@ -6,7 +6,6 @@ const ProductSchema = new mongoose.Schema({
   tenLamSan: { type: String, required: true },
   tenKhoaHoc: { type: String },
   khoiLuong: { type: Number, required: true },
-  donViTinh: { type: String },
   loaiHinhCheBienGo: { type: String },
   nguonGocGo: { type: String },
 }, { timestamps: true });

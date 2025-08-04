@@ -25,7 +25,7 @@ const validateProductInput = (product, loaiCoSoDangKy) => {
         return 'Tên lâm sản và khối lượng là bắt buộc.';
     }
 
-    if (loaiCoSoDangKy.includes('gỗ')) {
+    if (typeof loaiCoSoDangKy === 'string' && loaiCoSoDangKy.includes('gỗ')) {
         if (!product.loaiHinhCheBienGo || !product.nguonGocGo) {
             return 'Thiếu thông tin chế biến và nguồn gốc gỗ.';
         }
@@ -126,30 +126,59 @@ const bulkCreateFarms = async (req, res) => {
     }
 };
 
-// ==== THÊM LÂM SẢN / LOÀI NUÔI ====
-const addProductToFarm = async (req, res) => {
-    try {
-        const farmId = req.params.id;
-        const product = req.body;
+// ==== THÊM GỖ (WOOD PRODUCT) VÀO FARM ====
+const addWoodProductToFarm = async (req, res) => {
+  try {
+    const farm = await Farm.findById(req.params.id);
+    if (!farm) return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
 
-        const farm = await Farm.findById(farmId);
-        if (!farm) {
-            return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
-        }
+    const { tenLamSan, khoiLuong, loaiHinhCheBienGo, nguonGocGo } = req.body;
 
-        const error = validateProductInput(product, farm.loaiCoSoDangKy);
-        if (error) {
-            return res.status(400).json({ message: error });
-        }
-
-        farm.products.push(product);
-        await farm.save();
-
-        res.status(201).json({ message: 'Thêm lâm sản thành công.', product });
-    } catch (error) {
-        console.error("Lỗi khi thêm lâm sản:", error);
-        res.status(500).json({ message: 'Lỗi máy chủ.' });
+    if (!tenLamSan || !khoiLuong || !loaiHinhCheBienGo || !nguonGocGo) {
+      return res.status(400).json({ message: 'Thiếu thông tin sản phẩm gỗ.' });
     }
+
+    const woodProduct = { tenLamSan, khoiLuong, loaiHinhCheBienGo, nguonGocGo };
+
+    // 👇 Khởi tạo nếu cần
+    if (!farm.woodProducts) farm.woodProducts = [];
+
+    farm.woodProducts.push(woodProduct);
+    await farm.save();
+
+    res.status(201).json({ message: 'Thêm sản phẩm gỗ thành công.', product: woodProduct });
+  } catch (err) {
+    console.error("Lỗi khi thêm sản phẩm gỗ:", err);
+    res.status(500).json({ message: 'Lỗi máy chủ.' });
+  }
+};
+
+
+// ==== THÊM ĐỘNG VẬT (ANIMAL PRODUCT) VÀO FARM ====
+const addAnimalProductToFarm = async (req, res) => {
+  try {
+    const farm = await Farm.findById(req.params.id);
+    if (!farm) return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
+
+    const { tenLoai, mucDichNuoi, hinhThucNuoi, soLuong } = req.body;
+
+    if (!tenLoai || !mucDichNuoi || !hinhThucNuoi) {
+      return res.status(400).json({ message: 'Thiếu thông tin sản phẩm động vật.' });
+    }
+
+    const animalProduct = { tenLoai, mucDichNuoi, hinhThucNuoi, soLuong };
+
+    // 👇 Khởi tạo nếu cần
+    if (!farm.animalProducts) farm.animalProducts = [];
+
+    farm.animalProducts.push(animalProduct);
+    await farm.save();
+
+    res.status(201).json({ message: 'Thêm sản phẩm động vật thành công.', product: animalProduct });
+  } catch (err) {
+    console.error("Lỗi khi thêm sản phẩm động vật:", err);
+    res.status(500).json({ message: 'Lỗi máy chủ.' });
+  }
 };
 
 module.exports = {
@@ -159,5 +188,6 @@ module.exports = {
     updateFarm,
     deleteFarm,
     bulkCreateFarms,
-    addProductToFarm,
+    addWoodProductToFarm, // mới
+    addAnimalProductToFarm, // mới
 };
