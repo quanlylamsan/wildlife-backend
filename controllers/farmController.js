@@ -160,26 +160,39 @@ const addAnimalProductToFarm = async (req, res) => {
     const farm = await Farm.findById(req.params.id);
     if (!farm) return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
 
-    const { tenLamSan, tenKhoaHoc, danBoMeDuc, danBoMeCai, danHauBiDuc, danHauBiCai, duoiMotTuoi, trenMotTuoi} = req.body;
+    const { tenLamSan, tenKhoaHoc, danBoMe, danHauBi, duoiMotTuoi, trenMotTuoi } = req.body;
 
-    if (!tenLamSan || !tenKhoaHoc || !danBoMeDuc || !danBoMeCai || !danHauBiDuc || !danHauBiCai || !duoiMotTuoi || !trenMotTuoi) {
+    // Kiểm tra thiếu thông tin
+    if (
+      !tenLamSan || 
+      !tenKhoaHoc ||
+      !danBoMe || danBoMe.duc == null || danBoMe.cai == null ||
+      !danHauBi || danHauBi.duc == null || danHauBi.cai == null ||
+      duoiMotTuoi == null ||
+      trenMotTuoi == null
+    ) {
       return res.status(400).json({ message: 'Thiếu thông tin sản phẩm động vật.' });
     }
 
-    const animalProduct = { tenLamSan, tenKhoaHoc, danBoMeDuc, danBoMeCai, danHauBiDuc, danHauBiCai, duoiMotTuoi, trenMotTuoi  };
-
-    // 👇 Khởi tạo nếu cần
-    if (!farm.animalProducts) farm.animalProducts = [];
+    const animalProduct = {
+      tenLamSan,
+      tenKhoaHoc,
+      danBoMe,
+      danHauBi,
+      duoiMotTuoi,
+      trenMotTuoi
+    };
 
     farm.animalProducts.push(animalProduct);
     await farm.save();
 
-    res.status(201).json({ message: 'Thêm sản phẩm động vật thành công.', product: animalProduct });
-  } catch (err) {
-    console.error("Lỗi khi thêm sản phẩm động vật:", err);
-    res.status(500).json({ message: 'Lỗi máy chủ.' });
+    return res.status(201).json({ message: 'Đã thêm sản phẩm động vật.', data: animalProduct });
+  } catch (error) {
+    console.error('Lỗi khi thêm sản phẩm động vật:', error);
+    return res.status(500).json({ message: 'Lỗi server khi thêm sản phẩm động vật.' });
   }
 };
+
 
 module.exports = {
     createFarm,
