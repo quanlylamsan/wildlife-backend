@@ -1,29 +1,40 @@
-// routes/farmRoutes.js
 const express = require('express');
 const router = express.Router();
 
-// Import các hàm xử lý từ controller
 const {
     createFarm,
     getAllFarms,
     getFarmById,
     updateFarm,
     deleteFarm,
-    bulkCreateFarms // Phải import hàm mới
+    bulkCreateFarms,
+    addProductToFarm,
 } = require('../controllers/farmController');
 
-// Import middleware bảo mật
-const { protect, isAdminOrManager } = require('../middleware/authMiddleware');
+// Middleware bảo vệ nếu cần (tuỳ bạn bật/tắt)
+const { protect } = require('../middleware/authMiddleware');
 
-// --- Định nghĩa các API routes ---
+// === ROUTES ===
+
+// 🟢 Tạo mới một cơ sở
 router.post('/', protect, createFarm);
+
+// 📄 Lấy tất cả cơ sở
 router.get('/', protect, getAllFarms);
 
-// Thêm route mới cho chức năng tải lên hàng loạt
-router.post('/bulk', protect, isAdminOrManager, bulkCreateFarms);
-
+// 📄 Lấy một cơ sở theo ID
 router.get('/:id', protect, getFarmById);
-router.put('/:id', protect, isAdminOrManager, updateFarm);
-router.delete('/:id', protect, isAdminOrManager, deleteFarm);
+
+// 📝 Cập nhật cơ sở
+router.put('/:id', protect, updateFarm);
+
+// ❌ Xoá cơ sở
+router.delete('/:id', protect, deleteFarm);
+
+// 📥 Tạo hàng loạt cơ sở từ file Excel hoặc dữ liệu lớn
+router.post('/bulk', protect, bulkCreateFarms);
+
+// ➕ Thêm lâm sản hoặc loài nuôi vào cơ sở
+router.post('/:id/products', protect, addProductToFarm);
 
 module.exports = router;

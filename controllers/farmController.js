@@ -1,119 +1,163 @@
-const Farm = require('../models/Farm'); // Đảm bảo bạn đã có model Farm.js
+const Farm = require('../models/Farm');
 
-// @desc    Tạo một cơ sở mới
-// @route   POST /api/farms
-// @access  Private
-exports.createFarm = async (req, res) => {
+// ==== VALIDATION HỖ TRỢ ====
+const validateFarmInput = (data) => {
+    const requiredFields = [
+        'tenCoSo',
+        'tinhThanhPho',
+        'xaPhuong',
+        'diaChiCoSo',
+        'tenNguoiDaiDien',
+        'soCCCD',
+        'loaiCoSoDangKy',
+    ];
+
+    const missingFields = requiredFields.filter(field => !data[field]);
+    if (missingFields.length > 0) {
+        return `Thiếu trường bắt buộc: ${missingFields.join(', ')}`;
+    }
+
+    return null;
+};
+
+const validateProductInput = (product, loaiCoSoDangKy) => {
+    if (!product.tenLamSan || !product.khoiLuong) {
+        return 'Tên lâm sản và khối lượng là bắt buộc.';
+    }
+
+    if (loaiCoSoDangKy.includes('gỗ')) {
+        if (!product.loaiHinhCheBienGo || !product.nguonGocGo) {
+            return 'Thiếu thông tin chế biến và nguồn gốc gỗ.';
+        }
+    } else {
+        if (!product.mucDichNuoi || !product.hinhThucNuoi) {
+            return 'Thiếu mục đích và hình thức nuôi.';
+        }
+    }
+
+    return null;
+};
+
+// ==== TẠO MỚI CƠ SỞ ====
+const createFarm = async (req, res) => {
     try {
-        const newFarm = new Farm({
-            ...req.body,
-            owner: req.user.id // Tự động gán người dùng đang đăng nhập làm chủ sở hữu
-        });
-        const savedFarm = await newFarm.save();
-        res.status(201).json(savedFarm);
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi khi tạo cơ sở', error: err.message });
+        const error = validateFarmInput(req.body);
+        if (error) {
+            return res.status(400).json({ message: error });
+        }
+
+        const newFarm = new Farm(req.body);
+        await newFarm.save();
+        res.status(201).json(newFarm);
+    } catch (error) {
+        console.error("Lỗi khi tạo cơ sở:", error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
     }
 };
 
-// @desc    Lấy danh sách tất cả các cơ sở
-// @route   GET /api/farms
-// @access  Private
-exports.getAllFarms = async (req, res) => {
+// ==== LẤY DANH SÁCH TẤT CẢ CƠ SỞ ====
+const getAllFarms = async (req, res) => {
     try {
-        const farms = await Farm.find(); // Có thể thêm bộ lọc dựa trên vai trò người dùng sau này
-        res.json(farms);
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi khi lấy danh sách cơ sở', error: err.message });
+        const farms = await Farm.find();
+        res.status(200).json(farms);
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách cơ sở:", error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
     }
 };
 
-// @desc    Lấy thông tin một cơ sở theo ID
-// @route   GET /api/farms/:id
-// @access  Private
-exports.getFarmById = async (req, res) => {
+// ==== LẤY CƠ SỞ THEO ID ====
+const getFarmById = async (req, res) => {
     try {
         const farm = await Farm.findById(req.params.id);
         if (!farm) {
-            return res.status(404).json({ message: 'Không tìm thấy cơ sở' });
+            return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
         }
-        res.json(farm);
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi khi lấy thông tin cơ sở', error: err.message });
-    }
-};
-
-// @desc    Cập nhật thông tin một cơ sở
-// @route   PUT /api/farms/:id
-// @access  Private (Admin or Manager)
-exports.updateFarm = async (req, res) => {
-    try {
-        const updatedFarm = await Farm.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
-        if (!updatedFarm) {
-            return res.status(404).json({ message: 'Không tìm thấy cơ sở để cập nhật' });
-        }
-        res.json(updatedFarm);
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi khi cập nhật cơ sở', error: err.message });
-    }
-};
-
-// @desc    Xóa một cơ sở
-// @route   DELETE /api/farms/:id
-// @access  Private (Admin or Manager)
-exports.deleteFarm = async (req, res) => {
-    try {
-        const deletedFarm = await Farm.findByIdAndDelete(req.params.id);
-        if (!deletedFarm) {
-            return res.status(404).json({ message: 'Không tìm thấy cơ sở để xoá' });
-        }
-        res.json({ message: 'Xoá cơ sở thành công' });
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi khi xoá cơ sở', error: err.message });
-    }
-};
-
-// --- HÀM MỚI ĐƯỢC BỔ SUNG ---
-// @desc    Tạo nhiều cơ sở từ file CSV
-// @route   POST /api/farms/bulk
-// @access  Private (Admin or Manager)
-exports.bulkCreateFarms = async (req, res) => {
-    // req.body từ frontend sẽ là một mảng các đối tượng cơ sở
-    const farmsData = req.body;
-
-    // Kiểm tra dữ liệu đầu vào
-    if (!farmsData || !Array.isArray(farmsData) || farmsData.length === 0) {
-        return res.status(400).json({ message: 'Dữ liệu không hợp lệ hoặc rỗng.' });
-    }
-
-    try {
-        // Gán owner cho mỗi cơ sở nếu cần, tương tự như createFarm
-        const farmsWithOwner = farmsData.map(farm => ({
-            ...farm,
-            owner: req.user.id
-        }));
-
-        // Sử dụng insertMany của Mongoose để thêm hàng loạt, hiệu quả hơn vòng lặp
-        const createdFarms = await Farm.insertMany(farmsWithOwner, { ordered: false });
-        
-        // Trả về kết quả thành công
-        res.status(201).json({
-            message: `Tải lên thành công ${createdFarms.length} cơ sở.`,
-            successCount: createdFarms.length
-        });
-
+        res.status(200).json(farm);
     } catch (error) {
-        // Bắt lỗi nếu có, ví dụ lỗi validation hoặc trùng lặp
-        res.status(500).json({ 
-            message: 'Đã có lỗi xảy ra trong quá trình xử lý hàng loạt.',
-            error: error.message,
-            // Cung cấp thêm chi tiết lỗi nếu có
-            failCount: error.writeErrors ? error.writeErrors.length : 0, 
-            errorDetails: error.writeErrors 
-        });
+        console.error("Lỗi khi lấy cơ sở:", error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
     }
+};
+
+// ==== CẬP NHẬT CƠ SỞ ====
+const updateFarm = async (req, res) => {
+    try {
+        const farm = await Farm.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!farm) {
+            return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
+        }
+        res.status(200).json(farm);
+    } catch (error) {
+        console.error("Lỗi khi cập nhật cơ sở:", error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
+    }
+};
+
+// ==== XOÁ CƠ SỞ ====
+const deleteFarm = async (req, res) => {
+    try {
+        const farm = await Farm.findByIdAndDelete(req.params.id);
+        if (!farm) {
+            return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
+        }
+        res.status(200).json({ message: 'Xoá cơ sở thành công.' });
+    } catch (error) {
+        console.error("Lỗi khi xoá cơ sở:", error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
+    }
+};
+
+// ==== TẠO HÀNG LOẠT CƠ SỞ ====
+const bulkCreateFarms = async (req, res) => {
+    try {
+        const farms = req.body;
+
+        const invalid = farms.find(f => validateFarmInput(f));
+        if (invalid) {
+            return res.status(400).json({ message: 'Một số bản ghi thiếu thông tin bắt buộc.' });
+        }
+
+        const result = await Farm.insertMany(farms);
+        res.status(201).json(result);
+    } catch (error) {
+        console.error("Lỗi khi tạo hàng loạt:", error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
+    }
+};
+
+// ==== THÊM LÂM SẢN / LOÀI NUÔI ====
+const addProductToFarm = async (req, res) => {
+    try {
+        const farmId = req.params.id;
+        const product = req.body;
+
+        const farm = await Farm.findById(farmId);
+        if (!farm) {
+            return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
+        }
+
+        const error = validateProductInput(product, farm.loaiCoSoDangKy);
+        if (error) {
+            return res.status(400).json({ message: error });
+        }
+
+        farm.products.push(product);
+        await farm.save();
+
+        res.status(201).json({ message: 'Thêm lâm sản thành công.', product });
+    } catch (error) {
+        console.error("Lỗi khi thêm lâm sản:", error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
+    }
+};
+
+module.exports = {
+    createFarm,
+    getAllFarms,
+    getFarmById,
+    updateFarm,
+    deleteFarm,
+    bulkCreateFarms,
+    addProductToFarm,
 };
