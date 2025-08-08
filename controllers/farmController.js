@@ -156,6 +156,11 @@ const addWoodProductToFarm = async (req, res) => {
 
 // ==== THÊM ĐỘNG VẬT (ANIMAL PRODUCT) VÀO FARM ====
 const addAnimalProductToFarm = async (req, res) => {
+	 // ----- BẮT ĐẦU CODE CHẨN ĐOÁN -----
+  console.log('--- BÊN TRONG addAnimalProductToFarm ---');
+  console.log('Content-Type Header:', req.headers['content-type']);
+  console.log('BODY NHẬN ĐƯỢC:', req.body);
+  // ----- KẾT THÚC CODE CHẨN ĐOÁN -----
   try {
     const farm = await Farm.findById(req.params.id);
     if (!farm) return res.status(404).json({ message: 'Không tìm thấy cơ sở.' });
