@@ -4,8 +4,8 @@ const Farm = require('../models/Farm');
 const validateFarmInput = (data) => {
     const requiredFields = [
         'tenCoSo',
-        'tinhThanhPho',
-        'xaPhuong',
+        'province',
+        'commune',
         'diaChiCoSo',
         'tenNguoiDaiDien',
         'soCCCD',
@@ -40,14 +40,19 @@ const validateProductInput = (product, loaiCoSoDangKy) => {
 
 // ==== TẠO MỚI CƠ SỞ ====
 const createFarm = async (req, res) => {
+	console.log('BODY NHẬN ĐƯỢC:', req.body); // Di chuyển vào đây
     try {
         const error = validateFarmInput(req.body);
         if (error) {
+			console.log('--- LỖI Ở BƯỚC VALIDATE ---');
             return res.status(400).json({ message: error });
         }
 
         const newFarm = new Farm(req.body);
+		console.log('--- BƯỚC 2: DỮ LIỆU SAU KHI QUA SCHEMA, CHUẨN BỊ LƯU ---');
+        console.log(newFarm);
         await newFarm.save();
+		 console.log('--- BƯỚC 3: DỮ LIỆU ĐÃ LƯU THÀNH CÔNG ---');
         res.status(201).json(newFarm);
     } catch (error) {
         console.error("Lỗi khi tạo cơ sở:", error);

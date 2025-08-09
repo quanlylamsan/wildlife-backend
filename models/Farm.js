@@ -14,6 +14,7 @@ const ProductSchema = new mongoose.Schema({
 const AnimalProductSchema = new mongoose.Schema({
   tenLamSan: { type: String, required: true },
   tenKhoaHoc: { type: String },
+  tongDan: { type: Number },
   danBoMeDuc: { type: Number, default: 0 },
   danBoMeCai: { type: Number, default: 0 },
   danHauBiDuc: { type: Number, default: 0 },
@@ -39,16 +40,39 @@ const thongTinDanSchema = new mongoose.Schema({
   motTuoiTroLen: { type: Number, default: 0 },
 }, { _id: false });
 
-// === SCHEMA FARM CHÍNH ===
 const FarmSchema = new mongoose.Schema({
-  tenCoSo: String,
-  maSo: String,
-  loaiHinhCoSo: String, // gây nuôi / chế biến gỗ
-  diaChi: String,
+    // Thông tin cơ sở
+    tenCoSo: { type: String, required: true },
+    loaiCoSoDangKy: { type: String, required: true },
+    province: { type: String, required: true },
+    commune: { type: String, required: true },
+    diaChiCoSo: { type: String, required: true },
+    vido: { type: String },
+    kinhdo: { type: String },
+    ngayThanhLap: { type: Date },
+    trangThai: { type: String, default: 'Đang hoạt động' },
+    
+    // Thông tin người đại diện
+    tenNguoiDaiDien: { type: String, required: true },
+    namSinh: { type: String },
+    soCCCD: { type: String, required: true },
+    ngayCapCCCD: { type: Date },
+    noiCapCCCD: { type: String },
+    soDienThoaiNguoiDaiDien: { type: String },
+    diaChiNguoiDaiDien: { type: String },
 
-  products: [ProductSchema],         // ✅ sản phẩm gỗ
-  animalProducts: [AnimalProductSchema], // ✅ sản phẩm động vật
+    // Thông tin giấy phép
+    giayPhepKinhDoanh: { type: String },
+    issueDate: { type: Date }, // Ngày cấp phép
+    expiryDate: { type: Date }, // Ngày hết hạn
 
+    // Các trường dành riêng cho từng loại hình
+    mucDichNuoi: { type: String },
+    hinhThucNuoi: { type: String },
+    maSoCoSoGayNuoi: { type: String },
+    nganhNgheKinhDoanhGo: { type: String },
+    loaiHinhKinhDoanhGo: { type: String },
+     
   thongTinDan: thongTinDanSchema,
 }, { timestamps: true });
 
