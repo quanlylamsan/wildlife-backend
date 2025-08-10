@@ -31,14 +31,7 @@ const WoodActivitySchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-  source: { // Nguồn gốc (chỉ cho nhập)
-    type: String,
-    trim: true,
-    required: function () {
-      return this.type === 'import';
-    }
-  },
-  destination: { // Nơi đến (chỉ cho xuất)
+   destination: { // Nơi đến (chỉ cho xuất)
     type: String,
     trim: true,
   }, // <-- Dấu đóng ngoặc tròn ')' bị thiếu ở đây
