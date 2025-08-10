@@ -1,5 +1,7 @@
+// controllers/woodActivityController.js
+const mongoose = require('mongoose');
 const WoodActivity = require('../models/WoodActivity');
-const Wood = require('../models/Wood'); // Giả sử bạn có model này
+const Wood = require('../models/Wood');
 
 // @desc    Tạo bản ghi hoạt động gỗ mới
 // @route   POST /api/wood-activities
@@ -9,20 +11,39 @@ exports.createWoodActivity = async (req, res) => {
     }
 
     try {
-        const { wood, speciesName, date, type, quantity, unit, reason, source, destination, verifiedBy } = req.body;
+        let { wood, speciesName, date, type, quantity, unit, reason, source, destination, verifiedBy } = req.body;
 
-        // Tùy chọn: Kiểm tra xem ID gỗ có tồn tại không
-        const existingWood = await Wood.findById(wood);
+        // Nếu wood là object thì lấy _id
+        const woodId = typeof wood === 'object' ? wood._id : wood;
+
+        // Kiểm tra ID hợp lệ
+        if (!mongoose.Types.ObjectId.isValid(woodId)) {
+            return res.status(400).json({ message: 'ID gỗ không hợp lệ.' });
+        }
+
+        // Kiểm tra gỗ tồn tại
+        const existingWood = await Wood.findById(woodId);
         if (!existingWood) {
             return res.status(404).json({ message: 'Không tìm thấy mục gỗ này.' });
         }
 
+        // Tạo bản ghi mới
         const newWoodActivity = new WoodActivity({
-            wood, speciesName, date, type, quantity, unit, reason, source, destination, verifiedBy
+            wood: woodId,
+            speciesName,
+            date,
+            type,
+            quantity,
+            unit,
+            reason,
+            source,
+            destination,
+            verifiedBy
         });
 
         const savedActivity = await newWoodActivity.save();
         res.status(201).json(savedActivity);
+
     } catch (err) {
         console.error('POST /api/wood-activities error:', err);
         if (err.name === 'ValidationError') {
@@ -93,7 +114,6 @@ exports.updateWoodActivity = async (req, res) => {
 // @desc    Xóa một bản ghi hoạt động gỗ
 // @route   DELETE /api/wood-activities/:id
 exports.deleteWoodActivity = async (req, res) => {
-    // Middleware isAdmin đã kiểm tra quyền
     try {
         const deletedActivity = await WoodActivity.findByIdAndDelete(req.params.id);
         if (!deletedActivity) {
