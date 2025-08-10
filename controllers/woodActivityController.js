@@ -83,8 +83,18 @@ exports.getWoodActivitiesByFarmId = async (req, res) => {
             return res.status(400).json({ message: 'ID cơ sở không hợp lệ.' });
         }
 
-        const woodActivities = await WoodActivity.find({ farm: req.params.farmId }).sort({ date: 1 });
+        // Tạo đối tượng query ban đầu
+        let query = { farm: req.params.farmId };
+
+        // Thêm điều kiện lọc nếu có tham số speciesName từ frontend
+        if (req.query.speciesName) {
+            query.speciesName = req.query.speciesName;
+        }
+
+        // Tìm các bản ghi dựa trên query
+        const woodActivities = await WoodActivity.find(query).sort({ date: -1 }); // Sắp xếp theo ngày giảm dần
         res.json(woodActivities);
+
     } catch (err) {
         console.error(`GET /api/wood-activities/by-farm/${req.params.farmId} error:`, err);
         res.status(500).json({ message: 'Lỗi server khi lấy danh sách bản ghi', error: err.message });
