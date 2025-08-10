@@ -4,7 +4,7 @@ const router = express.Router();
 
 const {
     createWoodActivity,
-    getWoodActivitiesByWoodId,
+    getWoodActivitiesByFarmId, // 👈 đổi tên hàm
     getWoodActivityById,
     updateWoodActivity,
     deleteWoodActivity
@@ -18,8 +18,8 @@ router.post('/', protect, createWoodActivity);
 // Lấy chi tiết 1 hoạt động
 router.get('/detail/:id', protect, getWoodActivityById);
 
-// Lấy danh sách hoạt động theo woodId — ĐỔI TÊN ROUTE
-router.get('/by-wood/:woodId', protect, getWoodActivitiesByWoodId);
+// Lấy danh sách hoạt động theo farmId (thay vì woodId)
+router.get('/by-farm/:farmId', protect, getWoodActivitiesByFarmId); // 👈 đổi URL
 
 // Cập nhật 1 hoạt động
 router.put('/:id', protect, updateWoodActivity);

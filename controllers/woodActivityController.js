@@ -1,7 +1,7 @@
 // controllers/woodActivityController.js
 const mongoose = require('mongoose');
 const WoodActivity = require('../models/WoodActivity');
-const Wood = require('../models/Wood');
+const Farm = require('../models/Farm'); // thay Wood thành Farm
 
 // @desc    Tạo bản ghi hoạt động gỗ mới
 // @route   POST /api/wood-activities
@@ -11,30 +11,26 @@ exports.createWoodActivity = async (req, res) => {
     }
 
     try {
-        let { wood, speciesName, date, type, quantity, unit, reason, source, destination, verifiedBy } = req.body;
+        let { farm, speciesName, date, type, quantity, reason, source, destination, verifiedBy } = req.body;
 
-        // Nếu wood là object thì lấy _id
-        const woodId = typeof wood === 'object' ? wood._id : wood;
-
-        // Kiểm tra ID hợp lệ
-        if (!mongoose.Types.ObjectId.isValid(woodId)) {
-            return res.status(400).json({ message: 'ID gỗ không hợp lệ.' });
+        // Kiểm tra farmId hợp lệ
+        if (!mongoose.Types.ObjectId.isValid(farm)) {
+            return res.status(400).json({ message: 'ID cơ sở không hợp lệ.' });
         }
 
-        // Kiểm tra gỗ tồn tại
-        const existingWood = await Wood.findById(woodId);
-        if (!existingWood) {
-            return res.status(404).json({ message: 'Không tìm thấy mục gỗ này.' });
+        // Kiểm tra cơ sở tồn tại
+        const existingFarm = await Farm.findById(farm);
+        if (!existingFarm) {
+            return res.status(404).json({ message: 'Không tìm thấy cơ sở này.' });
         }
 
         // Tạo bản ghi mới
         const newWoodActivity = new WoodActivity({
-            wood: woodId,
+            farm,
             speciesName,
             date,
             type,
             quantity,
-            unit,
             reason,
             source,
             destination,
@@ -53,17 +49,18 @@ exports.createWoodActivity = async (req, res) => {
     }
 };
 
-// @desc    Lấy toàn bộ bản ghi hoạt động cho một mục gỗ cụ thể
-// @route   GET /api/wood-activities/:woodId
-exports.getWoodActivitiesByWoodId = async (req, res) => {
+// @desc    Lấy toàn bộ bản ghi hoạt động cho một cơ sở
+// @route   GET /api/wood-activities/by-farm/:farmId
+exports.getWoodActivitiesByFarmId = async (req, res) => {
     try {
-        const woodActivities = await WoodActivity.find({ wood: req.params.woodId }).sort({ date: 1 });
+        if (!mongoose.Types.ObjectId.isValid(req.params.farmId)) {
+            return res.status(400).json({ message: 'ID cơ sở không hợp lệ.' });
+        }
+
+        const woodActivities = await WoodActivity.find({ farm: req.params.farmId }).sort({ date: 1 });
         res.json(woodActivities);
     } catch (err) {
-        console.error(`GET /api/wood-activities/${req.params.woodId} error:`, err);
-        if (err.name === 'CastError') {
-            return res.status(400).json({ message: 'ID gỗ không hợp lệ.' });
-        }
+        console.error(`GET /api/wood-activities/by-farm/${req.params.farmId} error:`, err);
         res.status(500).json({ message: 'Lỗi server khi lấy danh sách bản ghi', error: err.message });
     }
 };

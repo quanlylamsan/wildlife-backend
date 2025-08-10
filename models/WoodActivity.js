@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const WoodActivitySchema = new mongoose.Schema({
-  Farm: { // ID của mục gỗ mà bản ghi này thuộc về
+  farm: { // ID của cơ sở mà bản ghi này thuộc về
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Farm', // Tham chiếu đến model Farm
     required: true,
@@ -25,11 +25,6 @@ const WoodActivitySchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0,
-  },
-  unit: { // Đơn vị (m3, kg, ...)
-    type: String,
-    required: true,
-    trim: true,
   },
   reason: { // Lý do nhập/xuất
     type: String,
