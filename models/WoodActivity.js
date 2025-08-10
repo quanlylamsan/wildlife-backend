@@ -15,6 +15,7 @@ const WoodActivitySchema = new mongoose.Schema({
   date: { // Ngày nhập/xuất
     type: Date,
     required: true,
+    trim: true,
   },
   type: { // Loại giao dịch: 'import' (nhập), 'export' (xuất)
     type: String,
@@ -40,10 +41,7 @@ const WoodActivitySchema = new mongoose.Schema({
   destination: { // Nơi đến (chỉ cho xuất)
     type: String,
     trim: true,
-    required: function () {
-      return this.type === 'export';
-    }
-  },
+  }, // <-- Dấu đóng ngoặc tròn ')' bị thiếu ở đây
   verifiedBy: { // Người xác nhận
     type: String,
     trim: true,
