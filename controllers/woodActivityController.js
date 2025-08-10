@@ -36,8 +36,34 @@ exports.createWoodActivity = async (req, res) => {
             destination,
             verifiedBy
         });
+		// ⭐⭐ THÊM LOGIC CẬP NHẬT TỒN KHO Ở ĐÂY ⭐⭐
+        // ----------------------------------------
 
+        // Tìm sản phẩm gỗ tương ứng trong mảng woodProducts của Farm
+        const woodProduct = existingFarm.woodProducts.find(
+            p => p.tenLamSan === speciesName
+        );
+
+        if (!woodProduct) {
+            return res.status(400).json({ message: 'Không tìm thấy sản phẩm lâm sản này trong cơ sở.' });
+        }
+
+        // Cập nhật khối lượng tồn kho
+        if (type === 'import') {
+            woodProduct.khoiLuong += quantity;
+        } else if (type === 'export') {
+            // Kiểm tra số lượng xuất không vượt quá tồn kho
+            if (woodProduct.khoiLuong < quantity) {
+                return res.status(400).json({ message: 'Số lượng xuất không được vượt quá tồn kho.' });
+            }
+            woodProduct.khoiLuong -= quantity;
+        }
+
+        // ----------------------------------------
+        // ⭐⭐ KẾT THÚC LOGIC CẬP NHẬT TỒN KHO ⭐⭐
         const savedActivity = await newWoodActivity.save();
+        await existingFarm.save(); // Lưu Farm đã được cập nhật
+
         res.status(201).json(savedActivity);
 
     } catch (err) {
