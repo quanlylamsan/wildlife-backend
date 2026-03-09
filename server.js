@@ -16,6 +16,7 @@ const woodActivitiesRoutes = require('./routes/woodActivities');
 const masterListRoutes = require('./routes/masterList'); // Route cho tỉnh/xã
 const userRoutes = require('./routes/users');           // Route cho người dùng
 const masterAnimalListRoutes = require('./routes/masterAnimalList');
+const animalRoutes = require("./routes/animalRoutes"); //Tăng, giảm đàn
 
 const corsOptions = {
   origin: ['https://quanlylamsan.github.io', 'http://localhost:3000', 'http://localhost:3001'],
@@ -41,6 +42,7 @@ app.use('/api/wood-activities', woodActivitiesRoutes);
 app.use('/api/master-product-list', masterListRoutes); // API tỉnh/xã sẽ nằm ở đây
 app.use('/api/master-animal-list', masterAnimalListRoutes);
 app.use('/api/users', userRoutes);                   // API người dùng sẽ nằm ở đây
+app.use("/api/animals", animalRoutes); //Tăng, giảm đàn
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
