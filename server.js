@@ -19,7 +19,7 @@ const masterAnimalListRoutes = require('./routes/masterAnimalList');
 const animalRoutes = require("./routes/animalRoutes"); //Tăng, giảm đàn
 
 const corsOptions = {
-  origin: ['https://quanlylamsan.github.io', 'http://localhost:3000', 'http://localhost:3001'],
+  origin: ['https://quanlylamsan.github.io', 'https://kiemlamdongthap.github.io','http://localhost:3000', 'http://localhost:3001'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
