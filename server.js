@@ -18,6 +18,7 @@ const userRoutes = require('./routes/users');           // Route cho người d�
 const masterAnimalListRoutes = require('./routes/masterAnimalList');
 const animalRoutes = require("./routes/animalRoutes"); //Tăng, giảm đàn
 const notebooklmRoutes = require("./routes/notebooklmRoutes"); //Sổ tay Ai
+const reportRoutes = require('./routes/reportRoutes');
 
 const corsOptions = {
   origin: ['https://quanlylamsan.github.io', 'https://kiemlamdongthap.github.io','http://localhost:3000', 'http://localhost:3001'],
@@ -45,6 +46,7 @@ app.use('/api/master-animal-list', masterAnimalListRoutes);
 app.use('/api/users', userRoutes);                   // API người dùng sẽ nằm ở đây
 app.use("/api/animals", animalRoutes); //Tăng, giảm đàn
 app.use('/api/notebooklm', notebooklmRoutes); //Sổ tay Ai
+app.use('/api/reports', reportRoutes); // 2. Gắn vào đường dẫn /api/reports
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
