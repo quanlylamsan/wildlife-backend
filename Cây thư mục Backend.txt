@@ -1,0 +1,74 @@
+Cây thư mục Backend
+project-root/
+├── .git/
+├── backend/
+├── controllers/
+	├── authController.js
+	├── authController2.js
+	├── customerController.js
+	├── farmController.js
+	├── farmController29.js
+	├── masterListController.js
+	├── userController.js
+	└── woodActivityController.js
+├── data/
+	└── reports
+		. 2024.xlsx
+		. 2025.xlsx
+		. QH.xlsx
+├── middleware/
+	. auth.js
+	. authMiddleware.js 
+	. canAccessFarm.js	
+├── models/
+	├── AnimalProduct.js
+	├── Commune.js
+	├── customerModel.js
+	├── Farm.js
+	├── FarmActivity.js
+	├── NotebookLM.js
+	├── Province.js
+	├── User.js
+	├── User1.js
+	├── User28.js
+	├── Wood.js
+	├── WoodActivity.js
+	└── WoodActivity29.js
+├── node_modules/
+├── routes/
+	├── animalRoutes.js
+	├── AppRoutes.js
+	├── auth0208.js
+	├── authRoutes.js
+	├── authRoutes0208.js
+	├── customerRoutes.js
+	├── customers.js
+	├── farmActivities.js
+	├── farms.js
+	├── farms0108.js
+	├── farms28.js
+	├── farms29.js
+	├── masterAnimalList.js
+	├── masterList.js
+	├── masterList29.js
+	├── notebooklmRoutes.js
+	├── reportRoutes.js
+	├── test.js
+	├── userRoutes.js
+	├── userRoutes1.js
+	├── userRoutes28.js
+	├── users.js
+	├── users28.js
+	├── woodActivities.js
+	├── woodActivities29.js
+	└── woods.js
+	└── reports.js (Quy hoach)
+├── utils/
+	. updateTotal.js
+├── .env
+├── .env.example
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── seed.js
+└── server.js
